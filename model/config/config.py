@@ -14,7 +14,6 @@ class ModelConfig:
     batch_size: int = 64
     epoch: int = 200
     future_offset: list = field(default_factory=lambda: [1, 3, 7, 14, 30])
-    val_clip_range: int = 150
     feature_cols: list = field(default_factory=lambda: [
         'open', 'close',
         'volume',
