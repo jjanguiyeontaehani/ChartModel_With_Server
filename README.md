@@ -27,8 +27,8 @@
     - [ ] train.py: 모델 학습 스크립트
     - [ ] predict.py: 모델 예측 스크립트
 - [ ] data: 주가 데이터셋 및 전처리 스크립트
-    - [ ] raw: 원본 주가 데이터
-    - [ ] processed: 전처리된 주가 데이터
+    - [X] raw: 원본 주가 데이터
+    - [X] processed: 전처리된 주가 데이터
     - [ ] preprocess.py: 데이터 전처리 스크립트
-    - [ ] fetch_data.py: 주가 데이터 수집 스크립트
+    - [X] fetch_data.py: 주가 데이터 수집 스크립트
 - [ ] web_app: Django 웹 애플리케이션
