@@ -3,7 +3,7 @@ import numpy as np
 import csv
 import os
 
-def preprocess(paths, config):
+def preprocessData(paths, config):
     def read_file(path):
         if path is None:
             return []
@@ -59,5 +59,5 @@ if __name__ == "__main__":
         'data/raw/AAPL_1h_20231110_20251108.csv',  # test
     ]
 
-    preprocess(data_paths, config)
+    preprocessData(data_paths, config)
     print("Data preprocessing completed.")

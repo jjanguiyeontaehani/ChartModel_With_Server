@@ -12,3 +12,5 @@ wheels/
 # data files
 data/raw/
 data/preprocessed/
+logs/
+performance.txt
