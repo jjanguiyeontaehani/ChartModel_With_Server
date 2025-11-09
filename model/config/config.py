@@ -38,8 +38,5 @@ class ModelConfig:
             if col not in self.all_cols:
                 self.all_cols.append(col)
 
-        total_weight = sum(self.signal_loss_weights)
-        self.signal_loss_weights = [w / total_weight / 10 for w in self.signal_loss_weights]
-
         self.input_size = len(self.feature_cols) + 1
         self.dim_head = self.dim_model // self.num_heads

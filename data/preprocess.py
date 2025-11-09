@@ -1,8 +1,9 @@
 import pandas as pd
+import numpy as np
 import csv
 import os
 
-def load_multiscale_stock_data(paths, config):
+def preprocess(paths, config):
     def read_file(path):
         if path is None:
             return []
@@ -38,13 +39,17 @@ def load_multiscale_stock_data(paths, config):
         if data_list:
             df = pd.DataFrame(data_list, columns=['Date'] + all_cols_manual)
             df['Date'] = pd.to_datetime(df['Date']).astype(int) / 10**9 # Convert to UNIX timestamp (float)
-            np = df.sort_values(by='Date').to_numpy(dtype=np.float32)
+            numpyData = df.sort_values(by='Date').to_numpy(dtype=np.float32)
         else:
-            np = np.empty((0, len(all_cols_manual)), dtype=np.float32)
-        
-        np.save(npy_path, np)
+            numpyData = np.empty((0, len(all_cols_manual)), dtype=np.float32)
+
+        np.save(npy_path, numpyData)
 
 if __name__ == "__main__":
+    import sys
+
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
     import model.config.config as config_module
     config = config_module.ModelConfig()
 
@@ -54,5 +59,5 @@ if __name__ == "__main__":
         'data/raw/AAPL_1h_20231110_20251108.csv',  # test
     ]
 
-    load_multiscale_stock_data(data_paths, config)
+    preprocess(data_paths, config)
     print("Data preprocessing completed.")
