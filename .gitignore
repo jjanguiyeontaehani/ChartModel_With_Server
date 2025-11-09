@@ -11,4 +11,4 @@ wheels/
 
 # data files
 data/raw/
-data/processed/
+data/preprocessed/
