@@ -332,6 +332,12 @@ if __name__ == "__main__":
         model, train_dataloader, validation_dataloader, test_dataloader, config, writer
     )
 
+    # save model
+    model_save_path = os.path.join("trained", f"{datafiles[0].split('/')[-1].split('.')[0]}_transformer_model.pth")
+    os.makedirs("trained", exist_ok=True)
+    torch.save(trained_model.state_dict(), model_save_path)
+    print(f"Model saved to {model_save_path}")
+
     writer.close()
 
     with open("performance.txt", "a") as f:
