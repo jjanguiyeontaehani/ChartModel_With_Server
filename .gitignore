@@ -9,8 +9,12 @@ wheels/
 # Virtual environments
 .venv
 
+# VS Code settings
+.vscode/
+
 # data files
 data/raw/
 data/preprocessed/
+model/trained/
 logs/
 performance.txt

@@ -26,7 +26,7 @@ class ModelConfig:
         'close'
     ])
     error_threshold: float = 0.02
-    learning_rate: float = 0.002
+    learning_rate: float = 0.0015
     min_learning_rate: float = 0.0001
     pad_token_id: float = 0.0
     device: str = 'cuda' if torch.cuda.is_available() else 'cpu'

@@ -4,31 +4,7 @@ import pandas as pd
 import time
 import os
 
-def main():
-    parser = argparse.ArgumentParser(description="Fetch and process financial data.")
-    parser.add_argument(
-        '--ticker',
-        type=str,
-        default='AAPL',
-        help='Ticker symbol of the stock')
-    parser.add_argument(
-        '--resolution',
-        type=str,
-        default='1h',
-        help='Data resolution (e.g., 1m, 5m, 1h, 1d)')
-    parser.add_argument(
-        '--start_date',
-        type=str,
-        # 729 days ago
-        default=time.strftime('%Y-%m-%d', time.gmtime(time.time() - 729*24*60*60)),
-        help='Start date in YYYY-MM-DD format')
-    parser.add_argument(
-        '--end_date',
-        type=str,
-        default=time.strftime('%Y-%m-%d', time.gmtime()),
-        help='End date in YYYY-MM-DD format')
-
-    args = parser.parse_args()
+def fetch_data(args):
 
     from_date = pd.to_datetime(args.start_date).tz_localize('UTC')
     to_date = pd.to_datetime(args.end_date).tz_localize('UTC')
@@ -139,8 +115,34 @@ def fetch_data_from_yfinance(symbol, resolution, from_date, to_date, directory):
         df = df.sort_values(by='Date')
         df.reset_index(drop=True, inplace=True)
 
-        df.to_csv(f'{directory}/{symbol}_{resolution}_{from_date.strftime("%Y%m%d")}_{to_date.strftime("%Y%m%d")}.csv', index=False)
+        df.to_csv(f'{directory}/{symbol}_{resolution}_{from_date.strftime("%Y-%m-%d")}_{to_date.strftime("%Y-%m-%d")}.csv', index=False)
 
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser(description="Fetch and process financial data.")
+    parser.add_argument(
+        '--ticker',
+        type=str,
+        default='AAPL',
+        help='Ticker symbol of the stock')
+    parser.add_argument(
+        '--resolution',
+        type=str,
+        default='1h',
+        help='Data resolution (e.g., 1m, 5m, 1h, 1d)')
+    parser.add_argument(
+        '--start_date',
+        type=str,
+        # 729 days ago
+        default=time.strftime('%Y-%m-%d', time.gmtime(time.time() - 729*24*60*60)),
+        help='Start date in YYYY-MM-DD format')
+    parser.add_argument(
+        '--end_date',
+        type=str,
+        default=time.strftime('%Y-%m-%d', time.gmtime()),
+        help='End date in YYYY-MM-DD format')
+
+    args = parser.parse_args()
+
+    fetch_data(args)

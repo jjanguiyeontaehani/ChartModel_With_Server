@@ -19,13 +19,13 @@
 
 
 # 프로젝트 구조
-- [ ] model: Decoder-only Transformer 모델
+- [X] model: Decoder-only Transformer 모델
     - [X] config: 각종 설정 파일
-    - [ ] pretrained: 사전 학습된 모델 가중치
+    - [X] pretrained: 사전 학습된 모델 가중치
     - [X] transformer.py: Transformer 모델 구현
     - [X] train.py: 모델 학습 스크립트
-    - [ ] predict.py: 모델 예측 스크립트
-- [ ] data: 주가 데이터셋 및 전처리 스크립트
+    - [X] predict.py: 모델 예측 스크립트
+- [X] data: 주가 데이터셋 및 전처리 스크립트
     - [X] raw: 원본 주가 데이터
     - [X] processed: 전처리된 주가 데이터
     - [X] preprocess.py: 데이터 전처리 스크립트
