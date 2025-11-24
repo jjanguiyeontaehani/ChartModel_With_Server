@@ -64,4 +64,4 @@ def train_on_request(symbol):
 
     train_model([train_data_dir, valid_data_dir, test_data_dir], model_save_path, config)
 
-    update_models.delay()
+    update_models()

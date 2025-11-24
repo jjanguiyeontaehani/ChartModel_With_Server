@@ -1,3 +1,4 @@
+import time
 import torch
 import numpy as np
 import yfinance as yf
@@ -65,13 +66,9 @@ def update_stock_datas(symbol, resolution='1h'):
     from datetime import datetime, timedelta
 
     for stock in Stock.objects.filter(symbol=symbol):
-        last_data = StockData.objects.filter(stock=stock).order_by('-time').first()
-        if last_data:
-            from_date = pd.to_datetime(last_data.time + timedelta(hours=1)).tz_localize('UTC')
-        else:
-            from_date = pd.to_datetime(datetime.now() - timedelta(days=30)).tz_localize('UTC')
 
-        to_date = pd.to_datetime(datetime.now()).tz_localize('UTC')
+        from_date = time.strftime('%Y-%m-%d', time.gmtime(time.time() - 729*24*60*60))
+        to_date = time.strftime('%Y-%m-%d', time.gmtime())
 
         if from_date >= to_date:
             print(f"No new data to update for {symbol}.")
@@ -107,38 +104,41 @@ def retrieve_stock_data_from_yfinance(symbol, resolution, from_date, to_date):
 
 
 def retrieve_stock_data_from_db(symbol, from_date, to_date, resolution='1h'):
-    stock = Stock.objects.get(symbol=symbol)
+    try:
+        stock = Stock.objects.get(symbol=symbol)
+    except Stock.DoesNotExist:
+        return pd.DataFrame()
+
     stock_data_qs = StockData.objects.filter(
         stock=stock,
         time__range=(from_date, to_date)
     ).order_by('time')
 
-    data = {
-        'Date': [],
-        'open': [],
-        'high': [],
-        'low': [],
-        'close': [],
-        'volume': [],
-        'is_predicted': []
-    }
+    values_list = stock_data_qs.values(
+        'time', 
+        'open', 
+        'high', 
+        'low', 
+        'close', 
+        'volume', 
+        'is_predicted'
+    )
+    
+    df = pd.DataFrame(list(values_list))
+    
+    df.columns = [
+        'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Is_Predicted'
+    ]
+    
+    if not df.empty:
+        df.set_index('Datetime', inplace=True)
+    df = add_technical_indicators(df)
 
-    for stock_data in stock_data_qs:
-        data['Date'].append(stock_data.time)
-        data['open'].append(stock_data.open)
-        data['high'].append(stock_data.high)
-        data['low'].append(stock_data.low)
-        data['close'].append(stock_data.close)
-        data['volume'].append(stock_data.volume)
-        data['is_predicted'].append(stock_data.is_predicted)
+    df.fillna(method='bfill', inplace=True)
 
-    data = add_technical_indicators(data)
-
-    data.fillna(method='bfill', inplace=True)
-
-    data = set_data_index_and_format(data, resolution)
-
-    df = convert_data_to_dataframe(data, from_date, to_date, resolution)
+    df = set_data_index_and_format(df, resolution)
+    
+    df = convert_data_to_dataframe(df, from_date, to_date, resolution)
 
     return df
 
