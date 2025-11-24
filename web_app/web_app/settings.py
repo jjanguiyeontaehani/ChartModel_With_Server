@@ -37,6 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'celery',
+    'django_celery_results',
+
+    'view',
+    'repositories',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +126,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+
+# test subtask result backend
+# Q_CLUSTER = {
+#     'name': 'DjangQ',
+#     'workers': 4,
+#     'timeout': 90,
+#     'retry': 120,
+#     'schedule': {
+#         'hourly_model_update': {
+#             'func': 'tasks.update_stock_datas',
+#             'schedule_type': 'I',
+#             'minutes': 60,
+#             'kwargs': {'retrain': True},
+#             'hook': 'tasks.model_update_hook',
+#         }
+#     }
+# }
