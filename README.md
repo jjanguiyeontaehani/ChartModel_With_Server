@@ -81,14 +81,6 @@
 uv uv sync
 ```
 
-### 웹 애플리케이션 실행
-```bash
-uv uv sync
-
-cd web_app
-python manage.py runserver
-```
-
 ### 모델 학습
 ```bash
 cd web_app
@@ -98,3 +90,19 @@ from services.tasks import train_on_request
 
 train_on_request('AAPL') # 'AAPL'을 원하는 주식 심볼로 변경 가능
 ```
+
+### 웹 애플리케이션 실행
+```bash
+uv uv sync
+
+cd web_app
+python manage.py runserver
+```
+
+# 향후 계획
+1. 모델 학습 및 예측 기능 완성
+    - 모델 학습 및 예측 기능이 서브 프로세스로 완전히 분리되도록 개선
+2. Django 웹 애플리케이션과의 통합
+3. 테스트 케이스 작성
+4. 프로젝트 리팩터링 및 최적화
+5. 배포 자동화 스크립트 작성
