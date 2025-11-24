@@ -12,7 +12,7 @@ class ModelConfig:
     num_heads: int = 4 # 8
     dropout: float = 0.15
     batch_size: int = 64
-    epoch: int = 200
+    epoch: int = 10
     future_offset: list = field(default_factory=lambda: [1, 3, 7, 14, 30])
     feature_cols: list = field(default_factory=lambda: [
         'open', 'close',
