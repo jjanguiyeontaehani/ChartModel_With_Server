@@ -17,4 +17,5 @@ data/raw/
 data/preprocessed/
 model/trained/
 logs/
+web_app/data/
 performance.txt
