@@ -129,6 +129,7 @@ def retrieve_stock_data_from_db(symbol, from_date, to_date, resolution='1h'):
     df.columns = [
         'Datetime', 'Open', 'High', 'Low', 'Close', 'Volume', 'Is_Predicted'
     ]
+    df["Date"] = pd.to_datetime(df['Datetime'])
     
     if not df.empty:
         df.set_index('Datetime', inplace=True)

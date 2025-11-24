@@ -74,37 +74,19 @@ class DatasetForPrediction(Dataset):
         return data_tensor, torch.tensor(norm_val, dtype=torch.float32)
     
 
-def dataloader_for_prediction(file_path, config):
-    def read_file(path):
-        if path is None:
-            return []
-        with open(path, 'r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
+def dataloader_for_prediction(df, config):
 
-            all_cols = config.all_cols
-
-            return [
-                [row['Date']] + [float(row[col]) for col in all_cols]
-                for row in reader if all(row[col] != '' for col in all_cols)
-            ]
-
-    data_list = read_file(file_path)
-
-    if not data_list:
-        raise ValueError(f"No data found in {file_path}")
+    if df.empty:
+        raise ValueError("No data found in the provided DataFrame")
 
     all_cols_manual = config.feature_cols.copy()
     for col in config.target_cols:
         if col not in all_cols_manual:
             all_cols_manual.append(col)
         
-    if data_list:
-        df = pd.DataFrame(data_list, columns=['Date'] + all_cols_manual)
-        df['Date'] = pd.to_datetime(df['Date']).astype(int) / 10**9 # Convert to UNIX timestamp (float)
-        numpyData = df.sort_values(by='Date').to_numpy(dtype=np.float32)
-    else:
-        numpyData = np.empty((0, len(all_cols_manual)), dtype=np.float32)
 
+    df['Date'] = pd.to_datetime(df['Date']).astype(int) / 10**9 # Convert to UNIX timestamp (float)
+    numpyData = df.sort_values(by='Date').to_numpy(dtype=np.float32)
 
     dataset = DatasetForPrediction(numpyData, config)
     dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
@@ -112,6 +94,7 @@ def dataloader_for_prediction(file_path, config):
 
 
 def predict(model, dataloader, freqs_cis):
+    config = ModelConfig()
     with torch.no_grad():
         for batch, norm_val in dataloader:
             input = batch.to(config.device, dtype=torch.float32)
