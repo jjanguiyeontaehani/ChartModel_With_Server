@@ -19,7 +19,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from model.config.config import ModelConfig
 from data.preprocess import preprocessData
-from transformer import TransformerModel, precompute_freqs_cis, create_attention_mask
+from model.transformer import TransformerModel, precompute_freqs_cis, create_attention_mask
 config = ModelConfig()
 
 def collate_fn_global(batch, config):
@@ -225,7 +225,7 @@ def train_model(model, train_dataloader, validation_dataloader, test_dataloader,
             for i, error_trend in enumerate(error_trends):
                 writer.add_scalar(f'Error Trend/test_offset', error_trend, i+1)
 
-    return model, trainLossHistory, validationLossHistory, validationAccuracyHistory, elapsedTime
+    return model, test_accuracy
 
 def validate_model(model, dataloader, freqs_cis, config):
     model.eval()
@@ -328,7 +328,7 @@ if __name__ == "__main__":
     model = TransformerModel(config)
     model.to(config.device)
     model.train()
-    trained_model, trainLossHistory, validationLossHistory, validationAccuracyHistory, elapsedTime = train_model(
+    trained_model, test_accuracy = train_model(
         model, train_dataloader, validation_dataloader, test_dataloader, config, writer
     )
 
@@ -339,15 +339,5 @@ if __name__ == "__main__":
     print(f"Model saved to {model_save_path}")
 
     writer.close()
-
-    with open("performance.txt", "a") as f:
-        f.write("model config: ")
-        f.write(str(config) + "\n")
-        f.write("train loss history: " + str(trainLossHistory) + "\n")
-        f.write("validation loss history: " + str(validationLossHistory) + "\n")
-        f.write("best validation loss: " + str(min([loss for loss in validationLossHistory if loss is not None])) + "\n")
-        f.write("validation accuracy history: " + str(validationAccuracyHistory) + "\n")
-        f.write("best validation accuracy: " + str(max([acc for acc in validationAccuracyHistory if acc is not None])) + "\n")
-        f.write(f"training time: {elapsedTime:.2f} seconds\n")
 
     print("Performance saved to performance.txt")
