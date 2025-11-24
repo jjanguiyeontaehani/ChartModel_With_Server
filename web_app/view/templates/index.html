@@ -1,0 +1,165 @@
+{% load app_filters %}
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} | 주식 예측 대시보드</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        .chart-container {
+            width: 60%;
+            margin: 50px auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header style="text-align: center; padding: 20px;">
+        <h1>{{ page_title }}</h1>
+        <p>기간: {{ start_date }} ~ {{ end_date }}</p>
+    </header>
+
+    <div class="chart-container">
+    </div>
+
+    <script>
+        function createChartConfig(symbol, rawChartData) {
+
+            const labels = rawChartData.map(item => item.date);
+            const prices = rawChartData.map(item => item.close);
+            const isPredictedFlags = rawChartData.map(item => item.isPredicted);
+
+            const config = {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '종가',
+                        data: prices,
+                        isPredicted: isPredictedFlags,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.4)',
+                        tension: 0.1,
+                        pointStyle: 'circle',
+                        pointBackgroundColor: isPredictedFlags.map(flag => flag ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'),
+                        pointHoverRadius: 6,
+                        pointRadius: 0,
+                        borderWidth: 2,
+                        fill: false,
+                        segment: {
+                            borderColor: (context) => {
+                                const index = context.p1DataIndex;
+                                const isPredicted = isPredictedFlags[index];
+
+                                return isPredicted ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)';
+                            },
+                            borderDash: (context) => {
+                                const index = context.p1DataIndex;
+                                const isPredicted = isPredictedFlags[index];
+
+                                return isPredicted ? [6, 6] : [];
+                            }
+                        }
+                    },
+                    {
+                        label: '예측 종가',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.4)',
+                        tension: 0.1,
+                        pointStyle: 'circle',
+                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                        pointHoverRadius: 6,
+                        pointRadius: 0,
+                        borderWidth: 2,
+                        fill: false,
+                    }
+                    ]
+                },
+                options: {
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: symbol + ' 시간별 종가',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function (context) {
+                                    const index = context.dataIndex;
+                                    const itemData = rawChartData[index];
+
+                                    const isPredicted = isPredictedFlags[index];
+
+                                    const date = labels[index];
+                                    let label = context.dataset.label || '';
+                                    const value = context.parsed.y.toLocaleString('ko-KR') || '';
+
+                                    const tooltipLines = [];
+
+                                    let dateLine = '날짜: ' + date;
+                                    tooltipLines.push(dateLine);
+
+                                    if (isPredicted) {
+                                        label = '예측 ' + label;
+                                    }
+
+                                    tooltipLines.push(label + ': ' + value + '원');
+
+                                    return tooltipLines;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '날짜'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '가격'
+                            },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            };
+
+            const ctx = document.createElement('canvas');
+            document.querySelector('.chart-container').appendChild(ctx);
+            const stockChart = new Chart(ctx.getContext('2d'), config);
+
+        }
+
+        {% for symbol in trained_models %}
+        (function () {
+            const symbol = '{{ symbol }}';
+            const dataJson = '{{ chart_data|get_item:symbol|safe }}';
+
+            const rawChartData = JSON.parse(dataJson);
+            const config = createChartConfig(symbol, rawChartData);
+        })();
+        {% endfor %}
+    </script>
+
+</body>
+
+</html>
